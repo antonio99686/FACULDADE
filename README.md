@@ -1,48 +1,30 @@
-# FACULDADE — Sistema Acadêmico PHP
+# FACULDADE — Sistema de Gestão Acadêmica v2.0
 
-## Requisitos
-- WampServer com PHP 8.1 ou superior e extensão PDO MySQL habilitada.
-- MySQL 8.0.16 ou superior (para CHECK / colunas geradas).
-- Apache com mod_authz_core e .htaccess habilitado.
+PHP 8.1+ / MySQL 8.0.16+ / WampServer. Os 11 módulos administrativos da atividade original foram preservados, incluindo a correção de `max()` no dashboard.
 
-## Instalação no Windows
-1. Copie a pasta `faculdade_php` para `C:\wamp64\www\faculdade_php`.
-2. No phpMyAdmin, execute o arquivo `database/faculdade.sql` (script original da atividade DDL 2).
-3. Abra `config.php` e confira host, porta, banco, usuário, senha e `base_url`.
-4. Acesse `http://localhost/faculdade_php/setup.php` e crie seu administrador (senha mínima de 10 caracteres).
-5. Entre em `http://localhost/faculdade_php/`.
+## Atualizar uma instalação existente
+1. Faça backup da pasta atual e exporte seu banco `faculdade` no phpMyAdmin.
+2. Copie os arquivos da nova pasta `faculdade_v2` para a pasta atual do WampServer (ex.: `C:\wamp64\www\FACULDADE`), substituindo os arquivos. **Não importe novamente** `database/faculdade.sql` em banco que já possui dados.
+3. Ajuste a chave `base_url` em `config.php` para `http://localhost/FACULDADE` (ou o nome real da pasta).
+4. Acesse o site e entre com a conta administrativa antiga.
+5. Abra `http://localhost/FACULDADE/upgrade.php` uma única vez. A migração adiciona `perfil`, `id_aluno`, `id_professor` e `ativo` em `sistema_usuario`, mantendo os administradores antigos.
+6. Vá à opção **Contas de acesso**. Cadastre um professor/aluno nos módulos normais antes de criar o login correspondente.
+7. Use `index.php?p=login` para entrar com qualquer um dos perfis. Professor/aluno é encaminhado automaticamente ao seu próprio portal.
 
-O `setup.php` cria apenas a tabela adicional `sistema_usuario`, para login, sem mexer nas 11 tabelas originais.
-Não há credenciais administrativas predefinidas.
+## Nova instalação
+1. Importe `database/faculdade.sql` no MySQL.
+2. Ajuste `config.php`.
+3. Entre em `/setup.php` e cadastre o primeiro administrador.
+4. Faça login, execute `/upgrade.php`, crie alunos e professores e depois seus acessos em **Contas de acesso**.
 
-## Funcionalidades
-- Login com hash de senha e sessão protegida; instalação de administrador no primeiro uso.
-- Dashboard com indicadores, média das notas e inscrições ativas por curso.
-- CRUD dos 11 conjuntos de dados originais: alunos, telefones, cursos, disciplinas, grade curricular, professores, áreas, inscrições, ofertas, matrículas/notas, auxílios.
-- Seleção de chaves estrangeiras em formulários, validação básica, proteção CSRF, PDO preparado.
-- Consulta, pesquisa e paginação em tabelas de cadastro, exportação CSV.
-- Ficha individual do aluno com histórico, boletim, telefones e auxílios; impressão.
-- Relatórios com quantidades, titulação, situação acadêmica, ofertas e médias por disciplina.
+## Permissões
+- Administrador: todos os 11 módulos, relatórios, exportação, contas e senhas.
+- Professor: consulta apenas turmas a ele atribuídas, estudantes dessas turmas e edita as duas notas; a média é calculada pelo banco.
+- Aluno: consulta apenas seus dados, cursos, boletim, média, telefones e auxílio.
 
-## Fluxo recomendado
-1. Cadastre cursos, disciplinas e professores.
-2. Vincule as disciplinas aos cursos em **Grade curricular**.
-3. Cadastre professores e suas áreas de atuação.
-4. Cadastre alunos e telefones.
-5. Crie a inscrição de um aluno em um curso (apenas uma ativa por aluno conforme o script do exercício).
-6. Crie ofertas de disciplinas para um curso, ano, semestre e professor.
-7. Matricule alunos nas ofertas compatíveis com suas inscrições e registre as notas.
-8. Consulte relatórios e fichas individuais.
-
-## Regras importantes
-- A média é gerada pelo MySQL com a fórmula `(nota1 + nota2)/2` quando ambas são informadas.
-- O aluno pode repetir disciplinas em **outra** oferta, mas não duas vezes na mesma execução.
-- Um único auxílio por aluno é garantido pelo `UNIQUE` do banco.
-- A aplicação bloqueia a matrícula em uma oferta sem inscrição ativa no curso correspondente.
-- Não é possível excluir um registro com filhos relacionados protegidos por `FOREIGN KEY`.
-- O banco aceita CPF com 11 dígitos, mas não verifica os dígitos verificadores.
-- A aplicação não implementa portal público do aluno, recuperação de senha, controle fino de perfis nem auditoria.
-
-## Segurança e publicação
-- Este é um projeto acadêmico para execução local no Wamp. Antes de publicar, configure HTTPS, política de senhas, limitação de tentativas de login, backup, logs, proteção de arquivo de configuração na hospedagem e revisão das regras de autorização.
-- Não exponha os arquivos de banco e configuração na web. Use DocumentRoot dedicado e variáveis de ambiente para credenciais em produção.
+## Atenção
+- Não há cadastro público automático de aluno/professor. Apenas o administrador cria credenciais e vínculos.
+- Ao desativar uma conta, ela deixa de fazer novos logins. Sessões já abertas não são revogadas de imediato neste protótipo.
+- `upgrade.php` exige sessão de administrador e pode ser removido após a migração.
+- Para publicação em produção: adicionar limitação de tentativas de login, HTTPS, auditoria, políticas de senha, validação de CPF e revisão de privilégios e fluxo de recuperação.
+- O banco original não possui frequência nem mensagens. Essas funcionalidades não foram inventadas para evitar modificar o modelo do exercício.

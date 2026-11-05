@@ -9,6 +9,10 @@ if($page==='logout'){
  valid_csrf();$_SESSION=[];session_regenerate_id(true);go('login');
 }
 require_auth();
+if ($page==='portal') { require __DIR__.'/portal.php'; exit; }
+if ($page==='grades_save') { require_role('professor'); require __DIR__.'/grades_save.php'; exit; }
+if ($page==='users') { require_admin(); require __DIR__.'/users.php'; exit; }
+require_admin();
 if($page==='save'||$page==='delete'){require __DIR__.'/actions.php';exit;}
 if($page==='export'){require __DIR__.'/export.php';exit;}
 require __DIR__.'/views.php';

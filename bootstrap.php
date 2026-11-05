@@ -33,7 +33,12 @@ function valid_csrf(): void {
     if (!hash_equals(csrf(), (string)($_POST['_csrf']??''))) { http_response_code(419); exit('Token CSRF inválido. Atualize a página e tente novamente.'); }
 }
 function flash(string $type,string $message): void { $_SESSION['flash']=['type'=>$type,'message'=>$message]; }
-function require_auth(): void { if (empty($_SESSION['admin_id'])) go('login'); }
+function require_auth(): void { if (empty($_SESSION['user_id'])) go('login'); }
+function require_admin(): void { require_auth(); if (($_SESSION['role'] ?? '') !== 'admin') { http_response_code(403); exit('Acesso restrito ao administrador.'); } }
+function current_role(): string { return (string)($_SESSION['role'] ?? ''); }
+function current_link_id(): int { return (int)($_SESSION['link_id'] ?? 0); }
+function require_role(string $role): void { require_auth(); if (current_role() !== $role) { http_response_code(403); exit('Você não possui permissão para acessar esta página.'); } }
+
 function query(string $sql,array $params=[]): array { $s=db()->prepare($sql); $s->execute($params); return $s->fetchAll(); }
 function one(string $sql,array $params=[]): ?array { $s=db()->prepare($sql);$s->execute($params); $row=$s->fetch();return $row?:null; }
 function count_table(string $name): int { return (int)db()->query('SELECT COUNT(*) FROM `'.$name.'`')->fetchColumn(); }

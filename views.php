@@ -16,7 +16,7 @@ function relation_label(string $table,string $col,mixed $id,array $modules): str
  return $r?(string)$r['label']:'#'.$id;
 }
 function key_params(array $record,array $meta): array { $r=[];foreach((array)$meta['pk'] as $pk)$r['key_'.$pk]=$record[$pk];return $r; }
-$nav=[['dashboard','Painel geral','▦'],['reports','Relatórios','▤']];
+$nav=[['dashboard','Painel geral','▦'],['reports','Relatórios','▤'],['users','Contas de acesso','🔑']];
 ?><!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101a35"><title><?=e(($meta['title']??'Painel').' | Gestão Acadêmica')?></title><link rel="stylesheet" href="assets/style.css"></head><body>
 <div class="app-layout"><aside class="sidebar" id="sidebar"><a href="<?=e(url('dashboard'))?>" class="brand"><span class="brand-icon">✦</span><span>FACULDADE <small>SISTEMA ACADÊMICO</small></span></a><div class="nav-caption">VISÃO GERAL</div>
 <?php foreach($nav as [$slug,$label,$icon]):?><a class="nav-link <?= $page===$slug?'active':'' ?>" href="<?=e(url($slug))?>"><span><?=e($icon)?></span><?=e($label)?></a><?php endforeach; ?>
